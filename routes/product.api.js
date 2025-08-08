@@ -19,6 +19,11 @@ router.put(
     productController.updateProduct
 );
 
+router.get(
+    '/:id',
+    productController.getProductDetail
+);
+
 router.delete(
     '/:id',
     authController.authenticate,
