@@ -42,7 +42,6 @@ productController.getProducts = async(req,res) => {
             const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
             response.totalPageNum = totalPageNum;
         }
-
         const productList = await query.exec();
         response.data = productList;
         res.status(200).json(response);
@@ -74,6 +73,17 @@ productController.updateProduct = async(req,res) => {
         res.status(200).json({status:'success', data: product})
     } catch(error){
         res.status(400).json({status:'faaail',error:error.message});
+    }
+};
+
+productController.deleteProduct = async(req,res) => {
+    try{
+        const productId = req.params.id;
+        const product = await Product.findByIdAndDelete({_id:productId});
+        if (!product) throw new Error('상품을 찾을 수 없습니다');
+        res.status(200).json({status:'success',data:product});
+    } catch(error){
+        res.status(400).json({status:'fail', error:error.message});
     }
 }
 
