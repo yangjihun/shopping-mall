@@ -43,7 +43,8 @@ cartController.getCart = async(req,res) => {
 cartController.updateCart = async(req,res) => {
     try{
         const {userId} = req;
-        const {cartItemId,qty} = req.body;
+        const cartItemId = req.params.id;
+        const {qty} = req.body;
         let cart = await Cart.findOne({userId}).populate({
             path:'items',
             populate:{
@@ -64,6 +65,19 @@ cartController.updateCart = async(req,res) => {
 cartController.deleteCart = async(req,res) => {
     try{
         const {userId} = req;
+        const cartItemId = req.params.id;
+        const cart = await Cart.findOne({ userId }).populate({
+            path:'items',
+            populate:{
+                path: 'productId',
+                model:'Product'
+            },
+        });
+    if (!cart) return res.status(404).json({ status: 'fail', error: 'Cart not found' });
+    const idx = cart.items.findIndex((item) => item._id.equals(cartItemId));
+    cart.items.splice(idx, 1);                // ← 배열에서 제거
+    await cart.save();
+    return res.status(200).json({status:'success', data:cart.items, cartItemQty: cart.items.length});
         
     } catch(error){
         res.status(400).json({status:'fail',error:error.message});

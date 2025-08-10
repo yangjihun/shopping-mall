@@ -72,7 +72,7 @@ productController.updateProduct = async(req,res) => {
         if (!product) throw new Error("item doesn't exist");
         res.status(200).json({status:'success', data: product})
     } catch(error){
-        res.status(400).json({status:'faaail',error:error.message});
+        res.status(400).json({status:'fail',error:error.message});
     }
 };
 
