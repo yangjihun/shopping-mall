@@ -34,7 +34,7 @@ cartController.getCart = async(req,res) => {
                 model:'Product'
             },
         });
-        res.status(200).json({status:'success', data:cart.items});
+        res.status(200).json({status:'success', data:cart.items, cartItemQty: cart.items.length});
     } catch(error){
         res.status(400).json({status:'fail', error:error.message});
     }
@@ -61,5 +61,13 @@ cartController.updateCart = async(req,res) => {
     }
 };
 
+cartController.deleteCart = async(req,res) => {
+    try{
+        const {userId} = req;
+        
+    } catch(error){
+        res.status(400).json({status:'fail',error:error.message});
+    }
+}
 
 module.exports = cartController;
