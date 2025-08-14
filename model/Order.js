@@ -13,7 +13,8 @@ const orderSchema = Schema({
         qty:{type:Number, required:true},
         price:{type:Number, required:true}
     }],
-    status:{type:String, default:'preparing'}
+    status:{type:String, default:'preparing'},
+    orderNum:{type:String}
 },{timestamps:true})
 orderSchema.methods.toJSON = function(){
     const obj = this._doc;
