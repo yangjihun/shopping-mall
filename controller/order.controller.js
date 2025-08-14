@@ -32,4 +32,24 @@ orderController.createOrder = async(req,res) => {
     }
 }
 
+orderController.getOrder = async(req,res) => {
+    try{
+        const {userId} = req;
+        let order = await Order.find({userId})
+            .populate({
+                path: 'items.productId',
+                model:'Product'
+            });
+        order = order.map(order => {
+            const totalPrice = order.items.reduce((sum, item) => {
+                return sum + (item.price * item.qty);
+            }, 0);
+            return {...order.toObject(), totalPrice};
+        });
+        res.status(200).json({status:'success', data:order});
+    } catch(error){
+        res.status(400).json({status:'fail', error:error.message});
+    }
+}
+
 module.exports=orderController;
