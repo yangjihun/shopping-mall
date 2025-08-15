@@ -23,32 +23,40 @@ productController.createProduct = async(req,res) => {
     }
 };
 
-productController.getProducts = async(req,res) => {
-    try{
-        const {page,name} = req.query;
-        // if (name) {
-        //     const products = await Product.find({name:{$regex:name,$options:'i'}}) // i: 대소문자 구분 x
-        // } else {
-        //     const products = await Product.find({});
-        // }
-        const cond = name ? {name: {$regex:name,$options:'i'}} : {};
-        let query = Product.find(cond);
-        let response = {status: "success"};
-        if (page) {
-            query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
-            // 최종 몇개 페이지
-            // 데이터 총 개수 / PAGE_SIZE
-            const totalItemNum = await Product.countDocuments(cond);
-            const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
-            response.totalPageNum = totalPageNum;
-        }
-        const productList = await query.exec();
-        response.data = productList;
-        res.status(200).json(response);
-    } catch(error){
-        res.status(400).json({status:'fail',error:error.message});
+productController.getProducts = async (req, res) => {
+  try {
+    const { page, name, category } = req.query;
+    const cond = {};
+    if (name && name.trim()) {
+      cond.name = { $regex: name.trim(), $options: "i" };
     }
+
+    if (category && category.trim() && category.toLowerCase() !== "all") {
+      const cats = category.split(",").map((c) => c.trim()).filter(Boolean);
+      if (cats.length > 0) {
+        cond.category = { $in: cats };
+      }
+    }
+    
+    let query = Product.find(cond);
+    const response = { status: "success" };
+    if (page) {
+      const pageNum = Math.max(parseInt(page, 10) || 1, 1);
+      query = query.skip((pageNum - 1) * PAGE_SIZE).limit(PAGE_SIZE);
+
+      const totalItemNum = await Product.countDocuments(cond);
+      const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE) || 1;
+
+      response.totalPageNum = totalPageNum;
+    }
+    const productList = await query.exec();
+    response.data = productList;
+    return res.status(200).json(response);
+  } catch (error) {
+    return res.status(400).json({ status: "fail", error: error.message });
+  }
 };
+
 
 productController.updateProduct = async(req,res) => {
     try{
